@@ -31,10 +31,10 @@ st.title("Windows application Tool")
 
 # --- INITIAL INPUTS ---
 col1, col2, col3, col4 = st.columns([1, 3, 1, 3])
-with col1: new_prod_input = st.text_area("New Product")
-with col2: new_ecdv_input = st.text_area("New ECDV")
-with col3: old_prod_input = st.text_area("Old Product")
-with col4: old_ecdv_input = st.text_area("Old ECDV")
+with col1: old_prod_input = st.text_area("Old Product")
+with col2: old_ecdv_input = st.text_area("Old ECDV")
+with col3: new_prod_input = st.text_area("New Product")
+with col4: new_ecdv_input = st.text_area("New ECDV")
 
 col_date, col_qtr = st.columns([1, 1])
 with col_date: dan_date_input = st.text_input("DAN Date (YYYY-MM-DD)")
