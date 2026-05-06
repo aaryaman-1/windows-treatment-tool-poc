@@ -1,5 +1,31 @@
 import streamlit as st
 import pandas as pd
+
+import streamlit as st
+import pandas as pd
+# ... (other imports)
+
+def format_custom_tsv(df: pd.DataFrame) -> str:
+    """
+    Industry 4.0 Specific Formatter:
+    Converts DataFrame to 'ColName+Value' tab-separated string.
+    Ignores empty lists [].
+    """
+    tsv_lines = []
+    for _, row in df.iterrows():
+        row_elements = []
+        for col in df.columns:
+            val = str(row[col]).strip()
+            # Filter out empty indicators used in your logic
+            if val not in ["[]", "['']", "", "nan", "None"]:
+                # Logic: Concatenate Column Header + Value (e.g., XF + 01 = XF01)
+                row_elements.append(f"{col}{val}")
+        if row_elements:
+            tsv_lines.append("\t".join(row_elements))
+    return "\n".join(tsv_lines)
+
+# Repeat the same for final_new logic
+
 from backend_window import (
     get_window_elements,
     process_index_simultaneously,
@@ -109,10 +135,11 @@ if st.session_state.stage >= 1:
                 user_inputs[f"old_vsd_{idx}"] = st.text_area(
                     "versions start date", key=f"ovsd_{idx}", height=table_height
                 )
-            
+
             with st.expander("📋 Copy Table for Excel (Old)"):
-                tsv_data_old = res["final_old"].to_csv(index=False, sep='\t')
-                st.code(tsv_data_old, language="text")
+                # Use our new formatter instead of standard to_csv
+                custom_tsv_old = format_custom_tsv(res["final_old"])
+                st.code(custom_tsv_old, language="text")
         
         # --- NEW DATAFRAME UI ---
         if not res["final_new"].empty:
@@ -130,10 +157,11 @@ if st.session_state.stage >= 1:
                 user_inputs[f"new_vsd_{idx}"] = st.text_area(
                     "versions start date", key=f"nvsd_{idx}", height=table_height
                 )
-            
+
             with st.expander("📋 Copy Table for Excel (New)"):
-                tsv_data_new = res["final_new"].to_csv(index=False, sep='\t')
-                st.code(tsv_data_new, language="text")
+                # Use our new formatter instead of standard to_csv
+                custom_tsv_new = format_custom_tsv(res["final_new"])
+                st.code(custom_tsv_new, language="text")
         
         st.markdown("---")
 
