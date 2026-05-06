@@ -1,6 +1,15 @@
 import streamlit as st
 import pandas as pd
 
+from backend_window import (
+    get_window_elements,
+    process_index_simultaneously,
+    identify_changed_combinations,
+    apply_window_elements,
+    filter_old_combinations,
+    execute_step_3_merging,
+    format_dataframe_for_display
+)
 
 def format_custom_tsv(df: pd.DataFrame) -> str:
     """
@@ -20,15 +29,6 @@ def format_custom_tsv(df: pd.DataFrame) -> str:
         if row_elements:
             tsv_lines.append("\t".join(row_elements))
     return "\n".join(tsv_lines)
-
-from backend_window import (
-    get_window_elements,
-    process_index_simultaneously,
-    identify_changed_combinations,
-    apply_window_elements,
-    filter_old_combinations,
-    execute_step_3_merging
-)
 
 st.set_page_config(layout="wide")
 
