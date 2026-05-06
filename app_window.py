@@ -21,8 +21,6 @@ def format_custom_tsv(df: pd.DataFrame) -> str:
             tsv_lines.append("\t".join(row_elements))
     return "\n".join(tsv_lines)
 
-# Repeat the same for final_new logic
-
 from backend_window import (
     get_window_elements,
     process_index_simultaneously,
