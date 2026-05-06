@@ -422,3 +422,42 @@ def execute_step_3_merging(old_p: str, df_old: pd.DataFrame, new_p: str, df_new:
             results["case_executed"] = "Case 2 (ECDV Modification)"
     
     return results
+
+# ==================================================
+# UI FORMATTING HELPER FUNCTIONS
+# ==================================================
+
+def format_cell_for_display(value):
+    """
+    Formats individual cells for the UI.
+    Converts lists into a clean string format with '+' and '()' for exceptions.
+    """
+    if isinstance(value, list):
+        if len(value) == 0:
+            return ""
+        lines = []
+        for i, v in enumerate(value):
+            if isinstance(v, str) and v.startswith("!"):
+                v = v[1:]
+            prefix = "" if i == 0 else "+"
+            lines.append(f"{prefix}({v})")
+        return "\n".join(lines)
+
+    if pd.isna(value):
+        return ""
+
+    s = str(value)
+    if s.startswith("!"):
+        return f"({s[1:]})"
+
+    return s
+
+def format_dataframe_for_display(df):
+    """
+    Applies the cell formatting to the entire DataFrame.
+    Returns a copy of the dataframe with all elements safely converted to strings.
+    """
+    display_df = df.copy()
+    for col in display_df.columns:
+        display_df[col] = display_df[col].apply(format_cell_for_display)
+    return display_df
