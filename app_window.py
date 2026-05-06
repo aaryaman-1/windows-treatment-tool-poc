@@ -112,13 +112,15 @@ if st.session_state.stage >= 1:
     for res in st.session_state.delta_results:
         idx = res["idx"]
         st.subheader(f"Index {idx} | Products: {res['old_p']} -> {res['new_p']}")
-        
+
         # --- OLD DATAFRAME UI ---
         if not res["final_old"].empty:
             st.markdown("**Final Old Combinations**")
             cols_old = st.columns([3, 1, 1])
             with cols_old[0]:
-                st.dataframe(res["final_old"], use_container_width=True)
+                # Format the dataframe safely for PyArrow and Streamlit
+                display_df_old = format_dataframe_for_display(res["final_old"])
+                st.dataframe(display_df_old, use_container_width=True)
             
             # Use fixed height to align multiline text boxes roughly with table
             table_height = len(res["final_old"]) * 35 + 40 
@@ -135,13 +137,15 @@ if st.session_state.stage >= 1:
                 # Use our new formatter instead of standard to_csv
                 custom_tsv_old = format_custom_tsv(res["final_old"])
                 st.code(custom_tsv_old, language="text")
-        
+
         # --- NEW DATAFRAME UI ---
         if not res["final_new"].empty:
             st.markdown("**Final New Combinations**")
             cols_new = st.columns([3, 1, 1])
             with cols_new[0]:
-                st.dataframe(res["final_new"], use_container_width=True)
+                # Format the dataframe safely for PyArrow and Streamlit
+                display_df_new = format_dataframe_for_display(res["final_new"])
+                st.dataframe(display_df_new, use_container_width=True)
             
             table_height = len(res["final_new"]) * 35 + 40
             with cols_new[1]:
