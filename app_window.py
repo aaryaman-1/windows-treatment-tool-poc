@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-import streamlit as st
-import pandas as pd
-# ... (other imports)
 
 def format_custom_tsv(df: pd.DataFrame) -> str:
     """
