@@ -403,34 +403,22 @@ def execute_step_3_merging(old_p: str, df_old: pd.DataFrame, new_p: str, df_new:
     old_exists = bool(old_p and str(old_p).strip())
     new_exists = bool(new_p and str(new_p).strip())
     
-    results = {"old_ecdv_output": None, "new_ecdv_output": None, "case_executed": None, "processed_old_df": None, "processed_new_df": None}
+    results = {"old_ecdv_output": None, "new_ecdv_output": None, "case_executed": None}
 
-    # Business logic remains untouched
     if old_exists and not new_exists:
         results["old_ecdv_output"] = generate_ecdv(df_old, CM, Family)
         results["case_executed"] = "Case 4 (Cancellation)"
-        results["processed_old_df"] = df_old
     elif new_exists and not old_exists:
         results["new_ecdv_output"] = generate_ecdv(df_new, CM, Family)
         results["case_executed"] = "Case 3 (Creation)"
-        results["processed_new_df"] = df_new
     elif old_exists and new_exists:
         if str(old_p).strip() != str(new_p).strip():
             results["old_ecdv_output"] = generate_ecdv(df_old, CM, Family)
             results["new_ecdv_output"] = generate_ecdv(df_new, CM, Family)
             results["case_executed"] = "Case 1 (Cancel and Replace)"
-            results["processed_old_df"] = df_old
-            results["processed_new_df"] = df_new
         else:
             df_merged = pd.concat([df_old, df_new], ignore_index=True)
             results["new_ecdv_output"] = generate_ecdv(df_merged, CM, Family)
             results["case_executed"] = "Case 2 (ECDV Modification)"
-            results["processed_new_df"] = df_merged
-
-    # FIX: Cast DataFrames to string before returning to UI to prevent PyArrow crash
-    if results["processed_old_df"] is not None:
-        results["processed_old_df"] = results["processed_old_df"].astype(str)
-    if results["processed_new_df"] is not None:
-        results["processed_new_df"] = results["processed_new_df"].astype(str)
-
+    
     return results
