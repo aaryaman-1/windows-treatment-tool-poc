@@ -85,13 +85,14 @@ if st.button("combinations undergoing change"):
             old_df, new_df, CM, Family = process_index_simultaneously(
                 idx, old_p_list, old_e_list, new_p_list, new_e_list
             )
-            final_old, final_new = identify_changed_combinations(
+            final_old, final_new, final_unchanged = identify_changed_combinations(
                 old_p_list[idx], old_df, new_p_list[idx], new_df
             )
             results_cache.append({
                 "idx": idx, "CM": CM, "Family": Family,
                 "old_p": old_p_list[idx], "new_p": new_p_list[idx],
-                "final_old": final_old, "final_new": final_new
+                "final_old": final_old, "final_new": final_new,
+                "final_unchanged": final_unchanged
             })
             
         st.session_state.delta_results = results_cache
@@ -199,6 +200,7 @@ if st.session_state.stage >= 1:
                 # 3. Merge and Generate
                 merge_results = execute_step_3_merging(
                     res["old_p"], filtered_df, res["new_p"], df_new,
+                    res["final_unchanged"],
                     res["CM"], res["Family"]
                 )
                 
