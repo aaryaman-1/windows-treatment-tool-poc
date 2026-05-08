@@ -166,10 +166,11 @@ def align_dataframes(df1: pd.DataFrame, df2: pd.DataFrame):
     return df1_aligned[all_columns], df2_aligned[all_columns]
 
 def identify_changed_combinations(old_p: str, old_df: pd.DataFrame, new_p: str, new_df: pd.DataFrame):
-    if not old_p and not new_p: return pd.DataFrame(), pd.DataFrame()
-    if not old_p and new_p: return pd.DataFrame(), new_df.copy()
-    if old_p and not new_p: return old_df.copy(), pd.DataFrame()
-    if old_p != new_p: return old_df.copy(), new_df.copy()
+    # Update the early return lines to look like this:
+    if not old_p and not new_p: return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    if not old_p and new_p: return pd.DataFrame(), new_df.copy(), pd.DataFrame()
+    if old_p and not new_p: return old_df.copy(), pd.DataFrame(), pd.DataFrame()
+    if old_p != new_p: return old_df.copy(), new_df.copy(), pd.DataFrame()
 
     old_changed_comb, new_changed_comb = align_dataframes(old_df, new_df)
     columns = old_changed_comb.columns
@@ -193,7 +194,8 @@ def identify_changed_combinations(old_p: str, old_df: pd.DataFrame, new_p: str, 
 
     final_old = old_changed_comb.drop(index=list(to_drop_old)).reset_index(drop=True)
     final_new = new_changed_comb.drop(index=list(to_drop_new)).reset_index(drop=True)
-    return final_old, final_new
+    final_unchanged = old_changed_comb.iloc[list(to_drop_old)].reset_index(drop=True)
+    return final_old, final_new, final_unchanged
 
 # =========================================================
 # STEP 3: WINDOW INJECTION & MERGING
@@ -399,7 +401,7 @@ def generate_ecdv(df: pd.DataFrame, CM: str, Family: str) -> str:
     else:
         return f"{prefix}{body}*"
 
-def execute_step_3_merging(old_p: str, df_old: pd.DataFrame, new_p: str, df_new: pd.DataFrame, CM: str, Family: str) -> dict:
+def execute_step_3_merging(old_p: str, df_old: pd.DataFrame, new_p: str, df_new: pd.DataFrame, final_unchanged: pd.DataFrame, CM: str, Family: str) -> dict:
     old_exists = bool(old_p and str(old_p).strip())
     new_exists = bool(new_p and str(new_p).strip())
     
@@ -417,7 +419,7 @@ def execute_step_3_merging(old_p: str, df_old: pd.DataFrame, new_p: str, df_new:
             results["new_ecdv_output"] = generate_ecdv(df_new, CM, Family)
             results["case_executed"] = "Case 1 (Cancel and Replace)"
         else:
-            df_merged = pd.concat([df_old, df_new], ignore_index=True)
+            df_merged = pd.concat([final_unchanged, df_old, df_new], ignore_index=True)
             results["new_ecdv_output"] = generate_ecdv(df_merged, CM, Family)
             results["case_executed"] = "Case 2 (ECDV Modification)"
     
